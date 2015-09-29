@@ -2,11 +2,11 @@
 #include <stdlib.h>
 
 #define min( i, j ) ( (i)<(j) ? (i): (j) )
-//#define KC 256
-//#define NC 512
+#define KC 256
+#define NC 512
 /*test only*/
-#define KC 64
-#define NC 64
+//#define KC 64
+//#define NC 64
 #define MC 48
 #define NR 4
 #define MR 4
@@ -495,6 +495,5 @@ int main(int argc, char *argv[]){
 		}
 	}
 */	
-
 
 }
