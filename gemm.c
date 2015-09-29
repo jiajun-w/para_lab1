@@ -54,12 +54,12 @@ static inline void rank_1x4(double *a, double *b, double *c , int kc, int M, int
         c00 += a[k] * b[k];
         c01 += a[k] * b[K+k];
         c02 += a[k] * b[2*K+k];
-        c02 += a[k] * b[3*K+k];
+        c03 += a[k] * b[3*K+k];
     }
     c[0] += c00;
     c[1]+=c01;
     c[2]+=c02;
-    c[3]+=c02;
+    c[3]+=c03;
     return;
 }
 
@@ -363,56 +363,50 @@ void gemm(double *A, double *B, double *C, int M, int N, int K){
                 int mc = min(MC, M-ic);
                 double *A_ptr3 = A_ptr4 + ic*K;
                 double *C_ptr3 = C_ptr + ic*N;
-                for(int pc=0; pc < mc; pc += MR){   //2-nd loop
-                    int mr = min(MR, mc-pc);
-                    double *A_ptr2 = A_ptr3 + pc*K;
-                    double *C_ptr2 = C_ptr3 + pc*N;
-                    for(int qc=0; qc < nc; qc +=NR){ //1-st loop
-                        int nr = min(NR, nc-qc);
-                        double *B_ptr1 = B_ptr4 + qc*K;
-						double *C_ptr1 = C_ptr2 + qc;
-						//printf("qc=%d, nc=%d\n",qc,nc);
-						//printf("A offset=%d, B offset=%d, C offset=%d\n",A_ptr2-A, B_ptr1-B, C_ptr1-C);
+                for(int pc=0; pc < nc; pc += NR){   //2-nd loop
+                    int nr = min(NR, nc-pc);
+                    double *B_ptr2 = B_ptr4 + pc*K;
+                    double *C_ptr2 = C_ptr3 + pc;
+                    for(int qc=0; qc < mc; qc +=MR){ //1-st loop
+                        int mr = min(MR, mc-qc);
+                        double *A_ptr1 = A_ptr3 + qc*K;
+						double *C_ptr1 = C_ptr2 + qc*N;
+						//printf("qc=%d, nc=%d, mr=%d, nr=%d\n",qc,nc,mr,nr);
+						//printf("A offset=[%d][%d], B offset=[%d][%d], C offset=[%d][%d]\n",ic+qc,rc, rc,pc+jc, ic+qc,pc+jc);
                         // rank-1 update, get a 4x4 of C
                         // matrix A mr x kc, matrix B kc x nr
-						/*
-                        for(int i=0; i<mr; i++)
-                            for(int j=0; j<nr; j++)
-                                for(int k=0; k<kc; k++)
-                                C_ptr1[i*N+j] += A_ptr2[i*K + k] * B_ptr1[j*K + k];
-                        */
                         if(mr == 1 && nr == 1)
-                            rank_1x1(A_ptr2,B_ptr1,C_ptr1,kc,M,N,K);
+                            rank_1x1(A_ptr1,B_ptr2,C_ptr1,kc,M,N,K);
                         else if(mr == 1 && nr == 2)
-                            rank_1x2(A_ptr2,B_ptr1,C_ptr1,kc,M,N,K);
+                            rank_1x2(A_ptr1,B_ptr2,C_ptr1,kc,M,N,K);
                         else if(mr == 1 && nr == 3)
-                            rank_1x3(A_ptr2,B_ptr1,C_ptr1,kc,M,N,K);
+                            rank_1x3(A_ptr1,B_ptr2,C_ptr1,kc,M,N,K);
                         else if(mr == 1 && nr == 4)
-                            rank_1x4(A_ptr2,B_ptr1,C_ptr1,kc,M,N,K);
+                            rank_1x4(A_ptr1,B_ptr2,C_ptr1,kc,M,N,K);
                         else if(mr == 2 && nr == 1)
-                            rank_2x1(A_ptr2,B_ptr1,C_ptr1,kc,M,N,K);
+                            rank_2x1(A_ptr1,B_ptr2,C_ptr1,kc,M,N,K);
                         else if(mr == 2 && nr == 2)
-                            rank_2x2(A_ptr2,B_ptr1,C_ptr1,kc,M,N,K);
+                            rank_2x2(A_ptr1,B_ptr2,C_ptr1,kc,M,N,K);
                         else if(mr == 2 && nr == 3)
-                            rank_2x3(A_ptr2,B_ptr1,C_ptr1,kc,M,N,K);
+                            rank_2x3(A_ptr1,B_ptr2,C_ptr1,kc,M,N,K);
                         else if(mr == 2 && nr == 4)
-                            rank_2x4(A_ptr2,B_ptr1,C_ptr1,kc,M,N,K);
+                            rank_2x4(A_ptr1,B_ptr2,C_ptr1,kc,M,N,K);
                         else if(mr == 3 && nr == 1)
-                            rank_3x1(A_ptr2,B_ptr1,C_ptr1,kc,M,N,K);
+                            rank_3x1(A_ptr1,B_ptr2,C_ptr1,kc,M,N,K);
                         else if(mr == 3 && nr == 2)
-                            rank_3x2(A_ptr2,B_ptr1,C_ptr1,kc,M,N,K);
+                            rank_3x2(A_ptr1,B_ptr2,C_ptr1,kc,M,N,K);
                         else if(mr == 3 && nr == 3)
-                            rank_3x3(A_ptr2,B_ptr1,C_ptr1,kc,M,N,K);
+                            rank_3x3(A_ptr1,B_ptr2,C_ptr1,kc,M,N,K);
                         else if(mr == 3 && nr == 4)
-                            rank_3x4(A_ptr2,B_ptr1,C_ptr1,kc,M,N,K);
+                            rank_3x4(A_ptr1,B_ptr2,C_ptr1,kc,M,N,K);
                         else if(mr == 4 && nr == 1)
-                            rank_4x1(A_ptr2,B_ptr1,C_ptr1,kc,M,N,K);
+                            rank_4x1(A_ptr1,B_ptr2,C_ptr1,kc,M,N,K);
                         else if(mr == 4 && nr == 2)
-                            rank_4x2(A_ptr2,B_ptr1,C_ptr1,kc,M,N,K);
+                            rank_4x2(A_ptr1,B_ptr2,C_ptr1,kc,M,N,K);
                         else if(mr == 4 && nr == 3)
-                            rank_4x3(A_ptr2,B_ptr1,C_ptr1,kc,M,N,K);
+                            rank_4x3(A_ptr1,B_ptr2,C_ptr1,kc,M,N,K);
                         else if(mr == 4 && nr == 4)
-                            rank_4x4(A_ptr2,B_ptr1,C_ptr1,kc,M,N,K);
+                            rank_4x4(A_ptr1,B_ptr2,C_ptr1,kc,M,N,K);
                     }
                 }
             }
@@ -449,7 +443,7 @@ int main(int argc, char *argv[]){
 //	printf("matrix A:\n");
 	for(int i=0; i<M; i++){
 		for(int k=0; k < K; k++){
-			A[i*K + k] = i*K + k;
+			A[i*K + k] = i*K / (k+1);
 //			printf("%d	",(int)A[i*K+k]);
 		}
 //		printf("\n");
@@ -459,7 +453,7 @@ int main(int argc, char *argv[]){
 //	printf("matrix B:\n");
 	for(int k=0; k<K; k++){
 		for(int j=0; j<N; j++){
-			B[j*K + k] = j*K + k;
+			B[j*K + k] = j*K / (k+1);
 //			printf("%d	",(int)B[j*K+k]);
 		}
 //		printf("\n");
@@ -487,13 +481,16 @@ int main(int argc, char *argv[]){
 	mm(A,B,ref_C,M,N,K);
 
 //	printf("Reference result:\n");
-/*
+
 	for(int i=0; i<M; i++){
 		for(int j=0; j<N; j++){
-			if(C[i*N+j] != ref_C[i*N+j])
-			printf("different: %d 	",i*N+j);
+			if(C[i*N+j] != ref_C[i*N+j]){
+				printf("result error: [%d][%d] 	",i,j);
+				return 0;
+			}
 		}
+		//printf("\n");
 	}
-*/	
+	
 
 }
