@@ -3,11 +3,12 @@
 #include <stdlib.h>
 #include "gen_matrix.h"
 #include "my_malloc.h"
-
+//#include "gemm.h"
 /*************************************************/
 /*matrix matrix multiplication, need optimization*/
 /*************************************************/
 // C = A * B, A(M*K) B(K*N) C(M*N)
+void gemm(double *A, double *B, double *C, int M, int N, int K); 
 void mm(double *A, double *B, double *C, int M, int N, int K){
     int x, y, k;
     for(y=0; y<M;y++)
@@ -153,7 +154,8 @@ int main(int argc, char** argv){
 //            if(rank == root)
 //                printf("process %d sent Matrix %d, part %d\n", root, multiplier, buffer_turn^0x1);
             B=buffer[buffer_turn];
-            mm(A, B, C, M, N, K); 
+            //mm(A, B, C, M, N, K); 
+            gemm(A, B, C, M, N, K); 
             C += N; 
             buffer_turn = buffer_turn ^ 0x1;
             MPI_Wait(&request, &status);
@@ -161,7 +163,8 @@ int main(int argc, char** argv){
 
         //last iteration only computation is required
         B=buffer[buffer_turn];
-        mm(A, B, C, M, N, K); 
+        //mm(A, B, C, M, N, K); 
+        gemm(A, B, C, M, N, K); 
         //end of a full matrix matrix mulipication
 
         result_turn = result_turn ^ 0x1;

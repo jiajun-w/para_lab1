@@ -1,0 +1,17 @@
+void gemm(double *A, double *B, double *C, int M, int N, int K);
+inline void rank_1x1(double *a, double *b, double *c, int kc, int M, int N, int K);
+inline void rank_1x2(double *a, double *b, double *c, int kc, int M, int N, int K);
+inline void rank_1x3(double *a, double *b, double *c, int kc, int M, int N, int K);
+inline void rank_1x4(double *a, double *b, double *c, int kc, int M, int N, int K);
+inline void rank_2x1(double *a, double *b, double *c, int kc, int M, int N, int K);
+inline void rank_2x2(double *a, double *b, double *c, int kc, int M, int N, int K);
+inline void rank_2x3(double *a, double *b, double *c, int kc, int M, int N, int K);
+inline void rank_2x4(double *a, double *b, double *c, int kc, int M, int N, int K);
+inline void rank_3x1(double *a, double *b, double *c, int kc, int M, int N, int K);
+inline void rank_3x2(double *a, double *b, double *c, int kc, int M, int N, int K);
+inline void rank_3x3(double *a, double *b, double *c, int kc, int M, int N, int K);
+inline void rank_3x4(double *a, double *b, double *c, int kc, int M, int N, int K);
+inline void rank_4x1(double *a, double *b, double *c, int kc, int M, int N, int K);
+inline void rank_4x2(double *a, double *b, double *c, int kc, int M, int N, int K);
+inline void rank_4x3(double *a, double *b, double *c, int kc, int M, int N, int K);
+inline void rank_4x4(double *a, double *b, double *c, int kc, int M, int N, int K);
